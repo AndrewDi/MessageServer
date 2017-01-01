@@ -44,8 +44,8 @@ public class MessageSaveJob implements Job {
                 datas.add(data);
             }
             i++;
-            second = Duration.between(begin,LocalDateTime.now()).toMillis();
-            if(i>0&&(i>=1000||second>=1000||messageQueue.isEmpty())){
+            second = Duration.between(begin,LocalDateTime.now()).getSeconds();
+            if(i>0&&(i>=1000||second>=1||messageQueue.isEmpty())){
                 LocalDateTime beginSave = LocalDateTime.now();
                 try {
                     this.jdbcTemplate.batchUpdate(this.messageQueue.getSQL(), datas);
@@ -63,7 +63,8 @@ public class MessageSaveJob implements Job {
                 finally {
                     datas.clear();
                     LocalDateTime endSave = LocalDateTime.now();
-                    logger.info("TabName:"+this.messageQueue.getTableProperty().getTabschema()+"."+this.messageQueue.getTableProperty().getTabname()+" Save Data Count:"+i+" Parse Cost:"+parseCost+" Millisecond Cost:"+Duration.between(beginSave,endSave).toMillis()+" Millisecond");
+                    long totalCost=Duration.between(beginSave,endSave).toMillis();
+                    logger.info("TabName:"+this.messageQueue.getTableProperty().getTabschema()+"."+this.messageQueue.getTableProperty().getTabname()+" Save Data Count:"+i+" Parse Cost:"+parseCost+" Millisecond Total Cost:"+totalCost+" Millisecond Avg Cost:"+totalCost/i);
                     i=0;
                     second=0;
                     parseCost=0;
