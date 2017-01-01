@@ -1,5 +1,6 @@
 package com.cmbchina;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -102,7 +103,8 @@ public class TableProperty {
         return  this.jdbcTemplate.query(sql, new RowMapper<ColumnProperty>() {
             @Override
             public ColumnProperty mapRow(ResultSet resultSet, int i) throws SQLException {
-                ColumnProperty columnProperty = new ColumnProperty(resultSet.getString("COLNAME"),resultSet.getString("TYPENAME"),resultSet.getInt("COLNO"),resultSet.getInt("KEYSEQ"),resultSet.getBoolean("NULLS"),resultSet.getInt("LENGTH"));
+                ColumnProperty columnProperty = new ColumnProperty(resultSet.getString("COLNAME"),resultSet.getString("TYPENAME"),resultSet.getInt("COLNO"),resultSet.getInt("KEYSEQ"),resultSet.getString("NULLS").equalsIgnoreCase("Y"),resultSet.getInt("LENGTH"));
+                logger.debug("ColName:"+columnProperty.getColName()+" Nulls:"+columnProperty.isNulls());
                 return columnProperty;
             }
         }, this.tabschema.toUpperCase(), this.tabname.toUpperCase());
