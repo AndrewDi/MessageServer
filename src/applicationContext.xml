@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <description>Spring公共配置文件 </description>
+
+    <!-- 将多个配置文件位置放到列表中 -->
+    <bean id="propertyResources" class="java.util.ArrayList">
+        <constructor-arg>
+            <list>
+                <value>file:conf/appconfig.properties</value>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <!-- 将配置文件读取到容器中，交给Spring管理 -->
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations" ref="propertyResources" />
+    </bean>
+
+    <bean id="dataSourceProxy" class="org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy">
+        <property name="targetDataSource" ref="DB2DruidDataSource"/>
+    </bean>
+
+    <!--注入jdbcTemplate -->
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <constructor-arg ref="dataSourceProxy"/>
+    </bean>
+
+    <!--使用Druid连接池 -->
+    <bean id="DB2DruidDataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <property name="driverClassName" value="com.ibm.db2.jcc.DB2Driver" />
+        <property name="url" value="${jdbc.url}" />
+        <property name="username" value="${jdbc.username}" />
+        <property name="password" value="${jdbc.password}" />
+        <property name="initialSize" value="${jdbc.initialSize}" />
+        <property name="maxActive" value="${jdbc.maxActive}" />
+        <property name="maxWait" value="60000" />
+        <property name="minIdle" value="5"/>
+        <property name="timeBetweenEvictionRunsMillis" value="60000" />
+        <property name="minEvictableIdleTimeMillis" value="300000" />
+        <property name="validationQuery" value="select 1 from sysibm.sysdummy1" />
+        <property name="testWhileIdle" value="true" />
+        <property name="testOnBorrow" value="false" />
+        <property name="testOnReturn" value="false" />
+        <property name="poolPreparedStatements" value="true" />
+        <property name="maxPoolPreparedStatementPerConnectionSize" value="20" />
+        <property name="filters" value="stat" />
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource">
+            <ref bean="DB2DruidDataSource"/>
+        </property>
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+
+    <bean id="messageSchedule" class="com.cmbchina.schedule.MessageSchedule" init-method="start" destroy-method="stop">
+        <property name="jdbcTemplate" ref="jdbcTemplate"></property>
+        <property name="tabschema" value="${tabschema}"></property>
+    </bean>
+    <!-- Netty 初始化 -->
+    <bean id="shellDataCollectorServer" class="com.cmbchina.netty.ShellDataCollectorServer" init-method="Start"  destroy-method="Stop">
+        <property name="port" value="${netty.port}"/>
+        <property name="workerThreads" value="${netty.threads}"/>
+        <property name="shellDataCollectorPipelineFactory" ref="shellDataCollectorPipelineFactory"/>
+    </bean>
+    <bean id="shellDataCollectorPipelineFactory" class="com.cmbchina.netty.ShellDataCollectorPipelineFactory">
+        <property name="shellDataCollectorHandler" ref="shellDataCollectorHandler"/>
+    </bean>
+    <bean id="shellDataCollectorHandler" class="com.cmbchina.netty.ShellDataCollectorHandler">
+        <property name="messageSchedule" ref="messageSchedule"/>
+    </bean>
+</beans>

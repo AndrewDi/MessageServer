@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="com.alibaba:druid:1.0.27" type="repository">
+    <properties maven-id="com.alibaba:druid:1.0.27" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/druid-1.0.27.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

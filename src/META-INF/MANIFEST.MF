@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Class-Path: lib/db2jcc_license_cu.jar lib/db2jcc.jar lib/logback-classic-1.1.8.jar lib/logback-core-1.1.8.jar
+            lib/slf4j-api-1.7.21.jar lib/spring-aspects-4.3.4.RELEASE.jar lib/spring-context-support-4.3.4.RELEASE.jar
+            lib/spring-aop-4.3.4.RELEASE.jar lib/spring-beans-4.3.4.RELEASE.jar lib/spring-instrument-4.3.4.RELEASE.jar
+            lib/spring-expression-4.3.4.RELEASE.jar lib/spring-instrument-tomcat-4.3.4.RELEASE.jar
+            lib/spring-context-4.3.4.RELEASE.jar lib/spring-core-4.3.4.RELEASE.jar lib/spring-jms-4.3.4.RELEASE.jar
+            lib/spring-messaging-4.3.4.RELEASE.jar lib/spring-jdbc-4.3.4.RELEASE.jar lib/spring-oxm-4.3.4.RELEASE.jar
+            lib/spring-orm-4.3.4.RELEASE.jar lib/aopalliance-1.0.jar
+            lib/spring-tx-4.3.4.RELEASE.jar lib/spring-test-4.3.4.RELEASE.jar lib/netty-all-4.0.42.Final.jar
+            lib/druid-1.0.27.jar lib/quartz-2.2.3.jar lib/c3p0-0.9.1.1.jar lib/slf4j-api-1.7.7.jar
+            lib/jcl-over-slf4j-1.7.21.jar lib/commons-lang3-3.5.jar
+Main-Class: com.cmbchina.MessageServer
+
