@@ -103,8 +103,7 @@ public class TableProperty {
         return  this.jdbcTemplate.query(sql, new RowMapper<ColumnProperty>() {
             @Override
             public ColumnProperty mapRow(ResultSet resultSet, int i) throws SQLException {
-                ColumnProperty columnProperty = new ColumnProperty(resultSet.getString("COLNAME"),resultSet.getString("TYPENAME"),resultSet.getInt("COLNO"),resultSet.getInt("KEYSEQ"),resultSet.getString("NULLS").equalsIgnoreCase("Y"),resultSet.getInt("LENGTH"));
-                logger.debug("ColName:"+columnProperty.getColName()+" Nulls:"+columnProperty.isNulls());
+                ColumnProperty columnProperty = new ColumnProperty(resultSet.getString("COLNAME"),resultSet.getString("TYPENAME"),resultSet.getInt("COLNO"),resultSet.getInt("KEYSEQ"),resultSet.getString("NULLS").equals("Y"),resultSet.getInt("LENGTH"));
                 return columnProperty;
             }
         }, this.tabschema.toUpperCase(), this.tabname.toUpperCase());

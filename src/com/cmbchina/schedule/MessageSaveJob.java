@@ -56,7 +56,7 @@ public class MessageSaveJob implements Job {
                             jdbcTemplate.update(this.messageQueue.getSQL(), row);
                         }
                         catch (Exception ex) {
-                            logger.error(ex.getMessage()+"\n"+StringUtils.join(row,","));
+                            logger.error(ex.getMessage()+"|"+StringUtils.join(row,","));
                         }
                     }
                 }
