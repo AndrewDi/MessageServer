@@ -39,6 +39,16 @@ public class MessageProperty {
         return this.data;
     }
 
+    public boolean isValid(){
+        if(data==null){
+            return false;
+        }
+        if(Duration.between(currentData,LocalDateTime.now()).getSeconds()>60){
+            return false;
+        }
+        return true;
+    }
+
     public Object[] Convert(TableProperty tableProperty){
         LocalDateTime beginParse = LocalDateTime.now();
         int columnSize=tableProperty.getColumnProperties().size();
