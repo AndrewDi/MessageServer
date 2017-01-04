@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.sql.SQLException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.Period;
@@ -19,7 +20,7 @@ import java.util.List;
  * Created by Andrew on 30/12/2016.
  */
 @PersistJobDataAfterExecution
-@DisallowConcurrentExecution
+//@DisallowConcurrentExecution
 public class MessageSaveJob implements Job {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private MessageQueue messageQueue;
@@ -54,8 +55,7 @@ public class MessageSaveJob implements Job {
                     for(Object[] row:datas){
                         try {
                             jdbcTemplate.update(this.messageQueue.getSQL(), row);
-                        }
-                        catch (Exception ex) {
+                        } catch (Exception ex) {
                             logger.error(ex.getMessage()+"|"+StringUtils.join(row,","));
                         }
                     }

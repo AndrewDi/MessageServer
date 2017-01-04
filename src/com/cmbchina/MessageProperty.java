@@ -54,7 +54,7 @@ public class MessageProperty {
         int columnSize=tableProperty.getColumnProperties().size();
         Object[] newMsg = new Object[columnSize];
         StringBuffer dataDump = new StringBuffer("Data Dump {\n");
-        for(int i=0;i<data.length&&i<columnSize;i++){
+        for(int i=0;i<data.length&&i<=columnSize;i++){
             if(i==0){
                 dataDump.append("TableName:"+data[0]+"\n");
                 continue;
@@ -71,7 +71,7 @@ public class MessageProperty {
                 }
             }
             else if(columnProperty.getColType().equals(TYPE_INT)||columnProperty.getColType().equals(TYPE_SMALLINT)||columnProperty.getColType().equals(TYPE_BIGINT)){
-                Boolean isEmpty = StringUtils.isBlank(data[i].toString())||StringUtils.isEmpty(data[i].toString());
+                Boolean isEmpty = StringUtils.isBlank(data[i].toString().trim())||StringUtils.isEmpty(data[i].toString().trim())||data[i].toString().trim().equals("");
                 if(isEmpty&&columnProperty.isNulls()){
                     newMsg[i-1]=null;
                 }
