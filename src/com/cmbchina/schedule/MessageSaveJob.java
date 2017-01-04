@@ -15,12 +15,15 @@ import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by Andrew on 30/12/2016.
  */
 @PersistJobDataAfterExecution
-//@DisallowConcurrentExecution
+@DisallowConcurrentExecution
 public class MessageSaveJob implements Job {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private MessageQueue messageQueue;
@@ -31,6 +34,17 @@ public class MessageSaveJob implements Job {
         this.messageQueue=(MessageQueue) jobExecutionContext.getJobDetail().getJobDataMap().get(MessageQueue.class.toString());
         this.jdbcTemplate = (JdbcTemplate)  jobExecutionContext.getJobDetail().getJobDataMap().get(JdbcTemplate.class.toString());
 
+        if(!messageQueue.getConcurrent())
+        {
+            try {
+                Boolean lock = messageQueue.getReentrantLock().tryLock(10, TimeUnit.MILLISECONDS);
+                if(!lock){
+                    return;
+                }
+            } catch (InterruptedException e) {
+                logger.error(e.getMessage());
+            }
+        }
         LocalDateTime begin=LocalDateTime.now();
         List<Object []> datas = new ArrayList<>();
         int i=0;
@@ -71,6 +85,10 @@ public class MessageSaveJob implements Job {
                     begin=LocalDateTime.now();
                 }
             }
+        }
+        if(!messageQueue.getConcurrent()&&messageQueue.getReentrantLock().isLocked())
+        {
+            messageQueue.getReentrantLock().unlock();
         }
     }
 }

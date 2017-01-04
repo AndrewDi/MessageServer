@@ -24,6 +24,7 @@ public class MessageSchedule {
     private ConcurrentHashMap<String,MessageQueue> messageQueueConcurrentHashMap;
     private Scheduler scheduler = null;
     private String tabschema;
+    private Boolean concurrent=false;
     private JdbcTemplate jdbcTemplate;
 
     public JdbcTemplate getJdbcTemplate() {
@@ -42,6 +43,14 @@ public class MessageSchedule {
         this.tabschema = tabschema;
     }
 
+    public Boolean getConcurrent() {
+        return concurrent;
+    }
+
+    public void setConcurrent(Boolean concurrent) {
+        this.concurrent = concurrent;
+    }
+
     public MessageSchedule() {
         logger.info("Start Init MessageSchedule");
         StdSchedulerFactory factory = new StdSchedulerFactory();
@@ -50,15 +59,19 @@ public class MessageSchedule {
             this.messageQueueConcurrentHashMap=new ConcurrentHashMap<>();
             scheduler = factory.getScheduler();
             scheduler.start();
+            logger.info("End Init MessageSchedule");
         } catch (SchedulerException e) {
             logger.error(e.getMessage().toString());
         }
     }
 
     public void start(){
+        logger.info("Begin Init MessageQueue Concurrent:"+this.getConcurrent());
         for(Map<String,Object> tabname:getTabName()){
             MessageQueue messageQueue = new MessageQueue(this.jdbcTemplate,tabschema,tabname.get("TABNAME").toString());
+            messageQueue.setConcurrent(this.getConcurrent());
             this.messageQueueConcurrentHashMap.put(tabname.get("TABNAME").toString().trim(),messageQueue);
+
             JobDetail jobDetail = newJob(MessageSaveJob.class)
                     .withIdentity(tabname.get("TABNAME").toString())
                     .build();
@@ -80,10 +93,12 @@ public class MessageSchedule {
                 logger.error(e.getStackTrace().toString());
             }
         }
+        logger.info("End Init MessageQueue");
     }
 
-    public void stop(){
-
+    public void stop() throws SchedulerException {
+        scheduler.clear();
+        scheduler.shutdown();
     }
 
     private List<Map<String, Object>> getTabName(){

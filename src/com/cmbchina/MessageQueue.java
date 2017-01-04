@@ -12,6 +12,7 @@ import java.text.ParseException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by Andrew on 30/12/2016.
@@ -22,7 +23,8 @@ public class MessageQueue {
     private ConcurrentLinkedQueue<MessageProperty> messages;
     private String tabschema;
     private String tabname;
-
+    private Boolean concurrent=false;
+    private ReentrantLock reentrantLock;
 
     public MessageQueue(JdbcTemplate jdbcTemplate,String tabschema, String tabname){
         this.tabschema=tabschema;
@@ -42,6 +44,23 @@ public class MessageQueue {
 
     public void reInit(JdbcTemplate jdbcTemplate){
         this.tableProperty = new TableProperty(jdbcTemplate,tabschema,tabname);
+    }
+
+    public Boolean getConcurrent() {
+        return concurrent;
+    }
+
+    public void setConcurrent(Boolean concurrent) {
+        this.concurrent = concurrent;
+        reentrantLock=new ReentrantLock();
+    }
+
+    public ReentrantLock getReentrantLock() {
+        return reentrantLock;
+    }
+
+    public void setReentrantLock(ReentrantLock reentrantLock) {
+        this.reentrantLock = reentrantLock;
     }
 
     public boolean isEmpty(){
