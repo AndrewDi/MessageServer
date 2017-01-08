@@ -63,6 +63,7 @@
         <property name="jdbcTemplate" ref="jdbcTemplate"/>
         <property name="tabschema" value="${tabschema}"/>
         <property name="concurrent" value="${concurrent}"/>
+        <property name="maxQueuesize" value="${maxqueuesize}"/>
     </bean>
     <!-- Netty 初始化 -->
     <bean id="shellDataCollectorServer" class="com.cmbchina.netty.ShellDataCollectorServer" init-method="Start"  destroy-method="Stop">

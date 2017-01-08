@@ -90,5 +90,11 @@ public class MessageSaveJob implements Job {
         {
             messageQueue.getReentrantLock().unlock();
         }
+
+        datas.clear();
+        this.messageQueue=null;
+        this.jdbcTemplate=null;
+        datas=null;
+        begin=null;
     }
 }

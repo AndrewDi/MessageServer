@@ -26,6 +26,15 @@ public class MessageSchedule {
     private String tabschema;
     private Boolean concurrent=false;
     private JdbcTemplate jdbcTemplate;
+    private int maxQueuesize;
+
+    public int getMaxQueuesize() {
+        return maxQueuesize;
+    }
+
+    public void setMaxQueuesize(int maxQueuesize) {
+        this.maxQueuesize = maxQueuesize;
+    }
 
     public JdbcTemplate getJdbcTemplate() {
         return jdbcTemplate;
@@ -69,6 +78,7 @@ public class MessageSchedule {
         logger.info("Begin Init MessageQueue Concurrent:"+this.getConcurrent());
         for(Map<String,Object> tabname:getTabName()){
             MessageQueue messageQueue = new MessageQueue(this.jdbcTemplate,tabschema,tabname.get("TABNAME").toString());
+            messageQueue.setMaxQueueSize(this.maxQueuesize);
             messageQueue.setConcurrent(this.getConcurrent());
             this.messageQueueConcurrentHashMap.put(tabname.get("TABNAME").toString().trim(),messageQueue);
 
