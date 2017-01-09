@@ -20,7 +20,7 @@ public class MessageQueue {
     private String tabname;
     private Boolean concurrent=false;
     private ReentrantLock reentrantLock;
-    private int maxQueueSize=1000;
+    private int maxQueueSize=5000;
 
     public MessageQueue(JdbcTemplate jdbcTemplate,String tabschema, String tabname){
         this.tabschema=tabschema;
@@ -35,6 +35,7 @@ public class MessageQueue {
 
     public void setMaxQueueSize(int maxQueueSize) {
         this.maxQueueSize = maxQueueSize;
+        logger.info(String.format("%s.%s maxqueuesize is %d",this.tabschema,this.tabname,this.maxQueueSize));
     }
 
     public MessageProperty poll(){
