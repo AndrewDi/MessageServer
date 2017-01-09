@@ -4,7 +4,11 @@
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/lib/druid-1.0.27.jar!/" />
     </CLASSES>
-    <JAVADOC />
-    <SOURCES />
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/lib/druid-1.0.27-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib/druid-1.0.27-sources.jar!/" />
+    </SOURCES>
   </library>
 </component>
