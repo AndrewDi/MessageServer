@@ -26,6 +26,7 @@ import java.util.concurrent.locks.ReentrantLock;
 @DisallowConcurrentExecution
 public class MessageSaveJob implements Job {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger loggerErrorData = LoggerFactory.getLogger("ErrorData");
     private MessageQueue messageQueue;
     private JdbcTemplate jdbcTemplate;
 
@@ -71,6 +72,7 @@ public class MessageSaveJob implements Job {
                             jdbcTemplate.update(this.messageQueue.getSQL(), row);
                         } catch (Exception ex) {
                             logger.error(ex.getMessage()+"|"+StringUtils.join(row,","));
+                            loggerErrorData.error(StringUtils.join(row,","));
                         }
                     }
                 }

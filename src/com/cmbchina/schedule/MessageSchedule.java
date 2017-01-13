@@ -2,6 +2,7 @@ package com.cmbchina.schedule;
 
 import com.cmbchina.MessageQueue;
 import com.cmbchina.Utils;
+import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
  */
 public class MessageSchedule {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger loggerErrorData = LoggerFactory.getLogger("ErrorData");
     private ConcurrentHashMap<String,MessageQueue> messageQueueConcurrentHashMap;
     private Scheduler scheduler = null;
     private String tabschema;
@@ -117,12 +119,26 @@ public class MessageSchedule {
     }
 
     public void processMessage(String msg,String host,int port){
+        String[] msgs = StringUtils.split(msg,"\r\n");
+        for(String message:msgs){
+            Object[] messageobject = StringUtils.splitPreserveAllTokens(message,",");
+            if(this.messageQueueConcurrentHashMap.containsKey(messageobject[0])){
+                this.messageQueueConcurrentHashMap.get(messageobject[0]).push(messageobject,host,port);
+            }
+            else {
+                loggerErrorData.error(StringUtils.join(messageobject,","));
+            }
+        }
+
+        /**
         String[] msgs=msg.split("\\\\\\\\r\\\\\\\\n");
         for(String message:msgs){
+            i++;
             Object [] messages = message.split(",");
             if(this.messageQueueConcurrentHashMap.containsKey(messages[0])){
                 this.messageQueueConcurrentHashMap.get(messages[0]).push(messages,host,port);
             }
         }
+         **/
     }
 }
