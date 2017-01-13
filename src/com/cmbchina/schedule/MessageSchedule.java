@@ -79,20 +79,20 @@ public class MessageSchedule {
     public void start(){
         logger.info("Begin Init MessageQueue Concurrent:"+this.getConcurrent());
         for(Map<String,Object> tabname:getTabName()){
-            MessageQueue messageQueue = new MessageQueue(this.jdbcTemplate,tabschema,tabname.get("TABNAME").toString());
+            MessageQueue messageQueue = new MessageQueue(this.jdbcTemplate,tabschema,tabname.get("TABNAME").toString().toUpperCase());
             messageQueue.setMaxQueueSize(this.maxQueuesize);
             messageQueue.setConcurrent(this.getConcurrent());
             this.messageQueueConcurrentHashMap.put(tabname.get("TABNAME").toString().trim(),messageQueue);
 
             JobDetail jobDetail = newJob(MessageSaveJob.class)
-                    .withIdentity(tabname.get("TABNAME").toString())
+                    .withIdentity(tabname.get("TABNAME").toString().toUpperCase())
                     .build();
             jobDetail.getJobDataMap().put(MessageQueue.class.toString(),messageQueue);
             jobDetail.getJobDataMap().put(JdbcTemplate.class.toString(),jdbcTemplate);
             logger.info("Build Job "+ jobDetail.getKey().getName());
 
             Trigger trigger = newTrigger()
-                    .withIdentity(tabname.get("TABNAME").toString())
+                    .withIdentity(tabname.get("TABNAME").toString().toUpperCase())
                     .startNow()
                     .withSchedule(simpleSchedule()
                             .withIntervalInSeconds(1)
@@ -122,8 +122,8 @@ public class MessageSchedule {
         String[] msgs = StringUtils.split(msg,"\r\n");
         for(String message:msgs){
             Object[] messageobject = StringUtils.splitPreserveAllTokens(message,",");
-            if(this.messageQueueConcurrentHashMap.containsKey(messageobject[0])){
-                this.messageQueueConcurrentHashMap.get(messageobject[0]).push(messageobject,host,port);
+            if(this.messageQueueConcurrentHashMap.containsKey(messageobject[0].toString().toUpperCase())){
+                this.messageQueueConcurrentHashMap.get(messageobject[0].toString().toUpperCase()).push(messageobject,host,port);
             }
             else {
                 loggerErrorData.error(StringUtils.join(messageobject,","));
