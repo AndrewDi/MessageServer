@@ -126,7 +126,7 @@ public class MessageSchedule {
                 this.messageQueueConcurrentHashMap.get(messageobject[0].toString().toUpperCase()).push(messageobject,host,port);
             }
             else {
-                loggerErrorData.error(StringUtils.join(messageobject,","));
+                loggerErrorData.error("No Table Handle Data:"+StringUtils.join(messageobject,","));
             }
         }
 

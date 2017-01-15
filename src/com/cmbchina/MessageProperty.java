@@ -149,7 +149,7 @@ public class MessageProperty {
         }
         dataDump.append("}\n");
         if(isError){
-            loggerErrorData.error(StringUtils.join(data,","));
+            loggerErrorData.error("Parse Error:"+StringUtils.join(data,","));
         }
         LocalDateTime endParse = LocalDateTime.now();
         Duration duration = Duration.between(beginParse,endParse);
