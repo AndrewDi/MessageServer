@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
  */
 public class MessageProperty {
     private static final Logger logger = LoggerFactory.getLogger(MessageServer.class);
+    private final Logger loggerErrorData = LoggerFactory.getLogger("ErrorData");
     private Object[] data;
     private String TYPE_INT="INTEGER";
     private String TYPE_SMALLINT="SMALLINT";
@@ -54,6 +55,7 @@ public class MessageProperty {
         int columnSize=tableProperty.getColumnProperties().size();
         Object[] newMsg = new Object[columnSize];
         StringBuffer dataDump = new StringBuffer("Data Dump {\n");
+        boolean isError=false;
         for(int i=0;i<data.length&&i<=columnSize;i++){
             if(i==0){
                 dataDump.append("TableName:"+data[0]+"\n");
@@ -64,6 +66,7 @@ public class MessageProperty {
                 if(data[i].toString().length()>columnProperty.getLength()){
                     logger.error(String.valueOf(data[i].toString().length()));
                     newMsg[i-1]=data[i].toString().substring(0,columnProperty.getLength()-1);
+                    isError=true;
                     logger.error(String.format("TabName:%s ColName:%s ColType:%s LongData:%s",data[0],columnProperty.getColName(),columnProperty.getColType(),newMsg[i-1]));
                 }
                 else {
@@ -77,6 +80,7 @@ public class MessageProperty {
                 }
                 else if(isEmpty&&!columnProperty.isNulls()){
                     newMsg[i-1]=-1;
+                    isError=true;
                     logger.error(String.format("Host:%s TabName:%s ColName:%s ColType:%s NotNumeric:%s",this.host,data[0],columnProperty.getColName(),columnProperty.getColType(),newMsg[i-1]));
                 }
                 else{
@@ -96,15 +100,18 @@ public class MessageProperty {
                         newMsg[i - 1] = data[i];
                     } catch (ParseException e) {
                         newMsg[i-1]="1900-01-01-00.00.00";
+                        isError=true;
                         logger.error(String.format("Host:%s TabName:%s ColName:%s ColType:%s ErrorTimestamp:%s",this.host,data[0],columnProperty.getColName(),columnProperty.getColType(),data[i]));
                     }
                 }
                 else if(data[i].toString().isEmpty()&&columnProperty.isNulls()){
                     newMsg[i-1]="1900-01-01-00.00.00";
+                    isError=true;
                     logger.error(String.format("Host:%s TabName:%s ColName:%s Nullable:%s ColType:%s Nullable_Timestamp:%s",this.host,data[0],columnProperty.getColName(),columnProperty.isNulls(),columnProperty.getColType(),data[i]));
                 }
                 else {
                     newMsg[i-1]="1900-01-01-00.00.00";
+                    isError=true;
                     logger.error(String.format("Host:%s TabName:%s ColName:%s ColType:%s Not_Null_Timestamp:%s",this.host,data[0],columnProperty.getColName(),columnProperty.getColType(),data[i]));
                 }
             }
@@ -115,15 +122,18 @@ public class MessageProperty {
                         newMsg[i - 1] = data[i];
                     } catch (ParseException e) {
                         newMsg[i-1]="1900-01-01";
+                        isError=true;
                         logger.error(String.format("Host:%s TabName:%s ColName:%s ColType:%s ErrorDate:%s",this.host,data[0],columnProperty.getColName(),columnProperty.getColType(),data[i]));
                     }
                 }
                 else if(data[i].toString().isEmpty()&&columnProperty.isNulls()){
                     newMsg[i-1]="1900-01-01";
+                    isError=true;
                     logger.error(String.format("Host:%s TabName:%s ColName:%s Nullable:%s ColType:%s Nullable_Date:%s",this.host,data[0],columnProperty.getColName(),columnProperty.isNulls(),columnProperty.getColType(),data[i]));
                 }
                 else {
                     newMsg[i-1]="1900-01-01";
+                    isError=true;
                     logger.error(String.format("Host:%s TabName:%s ColName:%s ColType:%s Not_Null_Date:%s",this.host,data[0],columnProperty.getColName(),columnProperty.getColType(),data[i]));
                 }
             }
@@ -138,6 +148,9 @@ public class MessageProperty {
             dataDump.append("Index:"+i+" ColName:"+columnProperty.getColName()+" Nullable:"+columnProperty.isNulls()+" Type:"+columnProperty.getColType()+" OldData:"+data[i]+" NewData:"+newMsg[i-1]+"\n");
         }
         dataDump.append("}\n");
+        if(isError){
+            loggerErrorData.error("Parse Error:"+StringUtils.join(data,","));
+        }
         LocalDateTime endParse = LocalDateTime.now();
         Duration duration = Duration.between(beginParse,endParse);
         dataDump.append("Parse Data Cost:"+duration.toMillis());
