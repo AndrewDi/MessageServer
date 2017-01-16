@@ -75,6 +75,10 @@ public class MessageProperty {
             }
             else if(columnProperty.getColType().equals(TYPE_INT)||columnProperty.getColType().equals(TYPE_SMALLINT)||columnProperty.getColType().equals(TYPE_BIGINT)){
                 Boolean isEmpty = StringUtils.isBlank(data[i].toString().trim())||StringUtils.isEmpty(data[i].toString().trim())||data[i].toString().trim().equals("");
+                //Fix数据中可能存在小数点
+                if(data[i].toString().contains(".")){
+                    data[i]=data[i].toString().substring(0,data[i].toString().indexOf("."));
+                }
                 if(isEmpty&&columnProperty.isNulls()){
                     newMsg[i-1]=null;
                 }
