@@ -26,7 +26,7 @@ public class MessageQueue {
         this.tabschema=tabschema;
         this.tabname=tabname;
         this.tableProperty = new TableProperty(jdbcTemplate,tabschema,tabname);
-        this.messages = new ConcurrentLinkedQueue<>();
+        this.messages = new ConcurrentLinkedQueue<MessageProperty>();
     }
 
     public int getMaxQueueSize() {

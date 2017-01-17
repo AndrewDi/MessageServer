@@ -25,7 +25,7 @@ public class TableProperty {
     private JdbcTemplate jdbcTemplate;
 
     public TableProperty(JdbcTemplate jdbcTemplate,String tabschema,String tabname){
-        this.columnProperties=new ArrayList<>();
+        this.columnProperties=new ArrayList<ColumnProperty>();
         this.tabschema=tabschema;
         this.tabname=tabname;
         this.jdbcTemplate = jdbcTemplate;
