@@ -67,7 +67,7 @@ public class MessageSchedule {
         StdSchedulerFactory factory = new StdSchedulerFactory();
         try {
             factory.initialize(Utils.getQuartzConf());
-            this.messageQueueConcurrentHashMap=new ConcurrentHashMap<>();
+            this.messageQueueConcurrentHashMap=new ConcurrentHashMap<String, MessageQueue>();
             scheduler = factory.getScheduler();
             scheduler.start();
             logger.info("End Init MessageSchedule");

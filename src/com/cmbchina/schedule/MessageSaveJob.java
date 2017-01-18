@@ -10,11 +10,8 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.sql.SQLException;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.Period;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -46,23 +43,23 @@ public class MessageSaveJob implements Job {
                 logger.error(e.getMessage());
             }
         }
-        LocalDateTime begin=LocalDateTime.now();
-        List<Object []> datas = new ArrayList<>();
+        long begin= Calendar.getInstance().getTimeInMillis();
+        List<Object []> datas = new ArrayList<Object[]>();
         int i=0;
         long second=0;
         long parseCost=0;
         while (!messageQueue.isEmpty()){
             MessageProperty messageProperty = messageQueue.poll();
-            LocalDateTime beginParse = LocalDateTime.now();
+            long beginParse = Calendar.getInstance().getTimeInMillis();
             Object[] data = messageProperty.Convert(this.messageQueue.getTableProperty());
-            parseCost+=Math.abs(Duration.between(beginParse,LocalDateTime.now()).toMillis());
+            parseCost+=Math.abs(Calendar.getInstance().getTimeInMillis()-beginParse);
             if(data!=null&&messageProperty.isValid()){
                 datas.add(data);
             }
             i++;
-            second = Duration.between(begin,LocalDateTime.now()).getSeconds();
+            second = (beginParse-begin)/1000;
             if(i>0&&(i>=1000||second>=1||messageQueue.isEmpty())){
-                LocalDateTime beginSave = LocalDateTime.now();
+                long beginSave = Calendar.getInstance().getTimeInMillis();
                 try {
                     this.jdbcTemplate.batchUpdate(this.messageQueue.getSQL(), datas);
                 }
@@ -78,13 +75,13 @@ public class MessageSaveJob implements Job {
                 }
                 finally {
                     datas.clear();
-                    LocalDateTime endSave = LocalDateTime.now();
-                    long totalCost=Duration.between(beginSave,endSave).toMillis();
+                    long endSave = Calendar.getInstance().getTimeInMillis();
+                    long totalCost=endSave-beginSave;
                     logger.info("TabName:"+this.messageQueue.getTableProperty().getTabschema()+"."+this.messageQueue.getTableProperty().getTabname()+" Save Data Count:"+i+" Parse Cost:"+parseCost+" Millisecond Total Cost:"+totalCost+" Millisecond Avg Cost:"+totalCost/i);
                     i=0;
                     second=0;
                     parseCost=0;
-                    begin=LocalDateTime.now();
+                    begin=Calendar.getInstance().getTimeInMillis();
                 }
             }
         }
@@ -97,6 +94,5 @@ public class MessageSaveJob implements Job {
         this.messageQueue=null;
         this.jdbcTemplate=null;
         datas=null;
-        begin=null;
     }
 }
